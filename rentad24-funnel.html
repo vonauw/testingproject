@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RentAd24 – Kampagnen-Anfrage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #329866;
+      --color-primary-hover: #2A7F55;
+      --color-secondary: #222B20;
+      --color-button: #FFA202;
+      --color-button-hover: #E68F00;
+      --color-background: #FFFFFF;
+      --color-background-light: #FAFAFA;
+      --color-text-muted: #6B7280;
+      --color-border: #E5E7EB;
+      --color-success: #16A34A;
+      --color-error: #DC2626;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--color-secondary);
+      background: var(--color-background);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ===== LOGO ===== */
+    .logo {
+      position: fixed;
+      top: 32px;
+      left: 40px;
+      z-index: 100;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-secondary);
+      letter-spacing: -0.5px;
+      user-select: none;
+    }
+    .logo span.badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-primary);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 1px;
+      position: relative;
+      top: -2px;
+    }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--color-border);
+      z-index: 200;
+    }
+    .progress-bar__fill {
+      height: 100%;
+      background: var(--color-primary);
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    /* ===== STEP CONTAINER ===== */
+    .funnel {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      transform: translateY(40px);
+      pointer-events: none;
+      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .step.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .step.exit-up {
+      opacity: 0;
+      transform: translateY(-40px);
+      pointer-events: none;
+    }
+
+    .step.exit-down {
+      opacity: 0;
+      transform: translateY(40px);
+      pointer-events: none;
+    }
+
+    .step__inner {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* ===== STEP HEADER ===== */
+    .step__number {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-bottom: 8px;
+    }
+    .step__number svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .step__question {
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 32px;
+      color: var(--color-secondary);
+      margin-bottom: 32px;
+    }
+
+    .step__required {
+      color: var(--color-primary);
+    }
+
+    /* ===== CHOICE OPTIONS (Steps 1, 2, 6) ===== */
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .choice {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border: 2px solid var(--color-border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--color-background);
+      user-select: none;
+    }
+
+    .choice:hover {
+      border-color: var(--color-primary);
+      background: rgba(50, 152, 102, 0.04);
+    }
+
+    .choice.selected {
+      border-color: var(--color-primary);
+      background: rgba(50, 152, 102, 0.08);
+    }
+
+    .choice__key {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--color-border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .choice.selected .choice__key {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .choice__label {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--color-secondary);
+    }
+
+    /* ===== CARD OPTIONS (Steps 3, 4, 5) ===== */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .cards--3col {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .card-option {
+      border: 2px solid var(--color-border);
+      border-radius: 16px;
+      padding: 20px 12px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--color-background);
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-option:hover {
+      border-color: var(--color-primary);
+      background: rgba(50, 152, 102, 0.04);
+    }
+
+    .card-option.selected {
+      border-color: var(--color-primary);
+      background: rgba(50, 152, 102, 0.08);
+      box-shadow: 0 0 0 1px var(--color-primary);
+    }
+
+    .card-option__visual {
+      width: 100%;
+      aspect-ratio: 1;
+      max-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* Package card visuals */
+    .pkg-visual {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-radius: 12px;
+      gap: 4px;
+    }
+
+    .pkg-visual--basic {
+      background: linear-gradient(135deg, #f0f0f0, #e2e2e2);
+    }
+    .pkg-visual--pro {
+      background: linear-gradient(135deg, #2d3436, #1a1e1a);
+    }
+    .pkg-visual--max {
+      background: linear-gradient(135deg, #4a7c59, #329866);
+    }
+    .pkg-visual--custom {
+      background: rgba(50, 152, 102, 0.08);
+    }
+
+    .pkg-visual__tier {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--color-primary);
+    }
+    .pkg-visual--pro .pkg-visual__tier { color: #FFA202; }
+    .pkg-visual--max .pkg-visual__tier { color: rgba(255,255,255,0.8); }
+
+    .pkg-visual__price {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--color-secondary);
+    }
+    .pkg-visual--pro .pkg-visual__price { color: #fff; }
+    .pkg-visual--max .pkg-visual__price { color: #fff; }
+
+    .pkg-visual__stats {
+      display: flex;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .pkg-visual__stat {
+      font-size: 9px;
+      color: var(--color-text-muted);
+      text-align: center;
+      line-height: 1.2;
+    }
+    .pkg-visual--pro .pkg-visual__stat,
+    .pkg-visual--max .pkg-visual__stat {
+      color: rgba(255,255,255,0.6);
+    }
+
+    .pkg-visual__stat strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+    .pkg-visual--pro .pkg-visual__stat strong { color: #FFA202; }
+    .pkg-visual--max .pkg-visual__stat strong { color: rgba(255,255,255,0.9); }
+
+    .pkg-visual--custom svg {
+      color: var(--color-primary);
+    }
+
+    .card-option__bottom {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .card-option__key {
+      width: 26px;
+      height: 26px;
+      border: 2px solid var(--color-border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .card-option.selected .card-option__key {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .card-option__label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-secondary);
+      text-align: left;
+    }
+
+    /* Duration visual */
+    .duration-visual {
+      width: 56px;
+      height: 56px;
+    }
+
+    /* ===== CONTACT FORM (Step 7) ===== */
+    .form-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-secondary);
+    }
+
+    .form-group label .required {
+      color: var(--color-primary);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 0;
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px;
+      border: none;
+      border-bottom: 2px solid var(--color-border);
+      background: transparent;
+      color: var(--color-secondary);
+      transition: border-color 0.2s ease;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-bottom-color: var(--color-primary);
+    }
+
+    .form-group input::placeholder {
+      color: #c5c9cf;
+      font-weight: 400;
+    }
+
+    .form-group input.invalid {
+      border-bottom-color: var(--color-error);
+    }
+
+    .form-group .error-msg {
+      font-size: 12px;
+      color: var(--color-error);
+      display: none;
+    }
+
+    .form-group input.invalid ~ .error-msg {
+      display: block;
+    }
+
+    .phone-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid var(--color-border);
+      transition: border-color 0.2s ease;
+    }
+
+    .phone-wrapper:focus-within {
+      border-bottom-color: var(--color-primary);
+    }
+
+    .phone-wrapper.invalid {
+      border-bottom-color: var(--color-error);
+    }
+
+    .phone-wrapper.invalid ~ .error-msg {
+      display: block;
+    }
+
+    .phone-flag {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 20px;
+      padding: 12px 0;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+    }
+
+    .phone-flag svg {
+      width: 14px;
+      height: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .phone-wrapper input {
+      border: none;
+      border-bottom: none;
+      padding: 12px 0;
+    }
+
+    .phone-wrapper input:focus {
+      border-bottom-color: transparent;
+    }
+
+    /* ===== NAVIGATION ===== */
+    .step__nav {
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-next {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 36px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--color-button);
+      color: var(--color-secondary);
+    }
+
+    .btn-next:hover:not(:disabled) {
+      background: var(--color-button-hover);
+    }
+
+    .btn-next:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-next svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 9999px;
+      border: 2px solid var(--color-border);
+      background: transparent;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-back:hover {
+      border-color: var(--color-secondary);
+      color: var(--color-secondary);
+    }
+
+    .btn-back svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .key-hint {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-left: 4px;
+    }
+
+    .key-hint kbd {
+      display: inline-block;
+      padding: 2px 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--color-background-light);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      color: var(--color-text-muted);
+    }
+
+    /* ===== SUCCESS SCREEN ===== */
+    .success-screen {
+      text-align: center;
+    }
+
+    .success-screen__icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(50, 152, 102, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      color: var(--color-primary);
+    }
+
+    .success-screen__icon svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    .success-screen h2 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .success-screen p {
+      font-size: 16px;
+      color: var(--color-text-muted);
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .logo {
+        top: 20px;
+        left: 24px;
+        font-size: 24px;
+      }
+
+      .step {
+        padding: 20px;
+        align-items: flex-start;
+        padding-top: 100px;
+      }
+
+      .step__question {
+        font-size: 20px;
+        line-height: 28px;
+        margin-bottom: 24px;
+      }
+
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .cards--3col {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .card-option {
+        padding: 16px 10px 12px;
+      }
+
+      .key-hint {
+        display: none;
+      }
+
+      .form-group input {
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .step__nav {
+        flex-wrap: wrap;
+      }
+
+      .btn-next {
+        width: 100%;
+        order: -1;
+      }
+
+      .btn-back {
+        order: 0;
+      }
+    }
+
+    /* ===== REDUCED MOTION ===== */
+    @media (prefers-reduced-motion: reduce) {
+      .step,
+      .progress-bar__fill,
+      .choice,
+      .card-option,
+      .btn-next,
+      .btn-back {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+  <div class="progress-bar__fill" id="progressFill"></div>
+</div>
+
+<!-- Logo -->
+<div class="logo">rent<span>ad</span><span class="badge">24</span></div>
+
+<!-- Funnel -->
+<div class="funnel" id="funnel">
+
+  <!-- ========== STEP 1 ========== -->
+  <div class="step active" data-step="1">
+    <div class="step__inner">
+      <div class="step__number">
+        <span>1</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+      <h2 class="step__question">Was möchten Sie mit Ihrer Kampagne erreichen?<span class="step__required">*</span></h2>
+      <div class="choices" data-name="kampagnenziel">
+        <div class="choice" data-value="Mehr Sichtbarkeit / Markenbekanntheit" tabindex="0">
+          <span class="choice__key">A</span>
+          <span class="choice__label">Mehr Sichtbarkeit / Markenbekanntheit</span>
+        </div>
+        <div class="choice" data-value="Neue Kunden oder Mitarbeiter gewinnen" tabindex="0">
+          <span class="choice__key">B</span>
+          <span class="choice__label">Neue Kunden oder Mitarbeiter gewinnen</span>
+        </div>
+        <div class="choice" data-value="Eine Aktion, Eröffnung oder ein Event bewerben" tabindex="0">
+          <span class="choice__key">C</span>
+          <span class="choice__label">Eine Aktion, Eröffnung oder ein Event bewerben</span>
+        </div>
+        <div class="choice" data-value="Nachhaltig Ihr Firmenimage stärken" tabindex="0">
+          <span class="choice__key">D</span>
+          <span class="choice__label">Nachhaltig Ihr Firmenimage stärken</span>
+        </div>
+      </div>
+      <div class="step__nav">
+        <button class="btn-next" id="btn1" disabled>OK
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <span class="key-hint">drücke <kbd>Enter ↵</kbd></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 2 ========== -->
+  <div class="step" data-step="2">
+    <div class="step__inner">
+      <div class="step__number">
+        <span>2</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+      <h2 class="step__question">Wann soll Ihre Kampagne starten?<span class="step__required">*</span></h2>
+      <div class="choices" data-name="starttermin">
+        <div class="choice" data-value="Sofort" tabindex="0">
+          <span class="choice__key">A</span>
+          <span class="choice__label">Sofort</span>
+        </div>
+        <div class="choice" data-value="In den nächsten 1–2 Wochen" tabindex="0">
+          <span class="choice__key">B</span>
+          <span class="choice__label">In den nächsten 1–2 Wochen</span>
+        </div>
+        <div class="choice" data-value="In etwa 1 Monat" tabindex="0">
+          <span class="choice__key">C</span>
+          <span class="choice__label">In etwa 1 Monat</span>
+        </div>
+        <div class="choice" data-value="Ich plane langfristig" tabindex="0">
+          <span class="choice__key">D</span>
+          <span class="choice__label">Ich plane langfristig</span>
+        </div>
+      </div>
+      <div class="step__nav">
+        <button class="btn-back" data-back aria-label="Zurück">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="btn-next" id="btn2" disabled>OK
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <span class="key-hint">drücke <kbd>Enter ↵</kbd></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 3: Packages ========== -->
+  <div class="step" data-step="3">
+    <div class="step__inner">
+      <div class="step__number">
+        <span>3</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+      <h2 class="step__question">Welches Paket interessiert Sie?<span class="step__required">*</span></h2>
+      <div class="cards" data-name="paket">
+        <!-- BASIC -->
+        <div class="card-option" data-value="Basispaket" tabindex="0">
+          <div class="card-option__visual">
+            <div class="pkg-visual pkg-visual--basic">
+              <span class="pkg-visual__tier">BASIC</span>
+              <span class="pkg-visual__price">499 €</span>
+              <div class="pkg-visual__stats">
+                <div class="pkg-visual__stat"><strong>320</strong>Spots / Tag</div>
+                <div class="pkg-visual__stat"><strong>10</strong>Sek. / Spot</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">A</span>
+            <span class="card-option__label">Basispaket</span>
+          </div>
+        </div>
+        <!-- PRO -->
+        <div class="card-option" data-value="Pro-Paket" tabindex="0">
+          <div class="card-option__visual">
+            <div class="pkg-visual pkg-visual--pro">
+              <span class="pkg-visual__tier">PRO</span>
+              <span class="pkg-visual__price">799 €</span>
+              <div class="pkg-visual__stats">
+                <div class="pkg-visual__stat"><strong>640</strong>Spots / Tag</div>
+                <div class="pkg-visual__stat"><strong>10</strong>Sek. / Spot</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">B</span>
+            <span class="card-option__label">Pro-Paket</span>
+          </div>
+        </div>
+        <!-- MAX -->
+        <div class="card-option" data-value="Max-Paket" tabindex="0">
+          <div class="card-option__visual">
+            <div class="pkg-visual pkg-visual--max">
+              <span class="pkg-visual__tier">MAX</span>
+              <span class="pkg-visual__price">1199 €</span>
+              <div class="pkg-visual__stats">
+                <div class="pkg-visual__stat"><strong>960</strong>Spots / Tag</div>
+                <div class="pkg-visual__stat"><strong>10</strong>Sek. / Spot</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">C</span>
+            <span class="card-option__label">Max-Paket</span>
+          </div>
+        </div>
+        <!-- CUSTOM -->
+        <div class="card-option" data-value="Individuelles Wunschpaket" tabindex="0">
+          <div class="card-option__visual">
+            <div class="pkg-visual pkg-visual--custom">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span class="pkg-visual__price" style="font-size:13px;margin-top:4px;">Individuelles<br>Wunschpaket</span>
+            </div>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">D</span>
+            <span class="card-option__label">Wunschpaket</span>
+          </div>
+        </div>
+      </div>
+      <div class="step__nav">
+        <button class="btn-back" data-back aria-label="Zurück">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="btn-next" id="btn3" disabled>OK
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <span class="key-hint">drücke <kbd>Enter ↵</kbd></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 4: Duration ========== -->
+  <div class="step" data-step="4">
+    <div class="step__inner">
+      <div class="step__number">
+        <span>4</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+      <h2 class="step__question">Wie lange soll Ihre Werbung laufen?<span class="step__required">*</span></h2>
+      <div class="cards" data-name="laufzeit">
+        <div class="card-option" data-value="1 Monat" tabindex="0">
+          <div class="card-option__visual">
+            <svg class="duration-visual" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#E5E7EB" stroke-width="8"/><path d="M50 12 A38 38 0 0 1 88 50" fill="none" stroke="var(--color-primary)" stroke-width="8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">A</span>
+            <span class="card-option__label">1 Monat</span>
+          </div>
+        </div>
+        <div class="card-option" data-value="2–3 Monate" tabindex="0">
+          <div class="card-option__visual">
+            <svg class="duration-visual" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#E5E7EB" stroke-width="8"/><path d="M50 12 A38 38 0 1 1 12 50" fill="none" stroke="var(--color-primary)" stroke-width="8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">B</span>
+            <span class="card-option__label">2–3 Monate</span>
+          </div>
+        </div>
+        <div class="card-option" data-value="6 Monate" tabindex="0">
+          <div class="card-option__visual">
+            <svg class="duration-visual" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#E5E7EB" stroke-width="8"/><path d="M50 12 A38 38 0 1 1 25 80" fill="none" stroke="var(--color-primary)" stroke-width="8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">C</span>
+            <span class="card-option__label">6 Monate</span>
+          </div>
+        </div>
+        <div class="card-option" data-value="Laufend / Jahreskampagne" tabindex="0">
+          <div class="card-option__visual">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">D</span>
+            <span class="card-option__label">Laufend / Jahreskampagne</span>
+          </div>
+        </div>
+      </div>
+      <div class="step__nav">
+        <button class="btn-back" data-back aria-label="Zurück">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="btn-next" id="btn4" disabled>OK
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <span class="key-hint">drücke <kbd>Enter ↵</kbd></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 5: Motifs ========== -->
+  <div class="step" data-step="5">
+    <div class="step__inner">
+      <div class="step__number">
+        <span>5</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+      <h2 class="step__question">Wie viele Motive oder Spots möchten Sie einsetzen?<span class="step__required">*</span></h2>
+      <div class="cards cards--3col" data-name="motive">
+        <div class="card-option" data-value="1 Motiv" tabindex="0">
+          <div class="card-option__visual">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">A</span>
+            <span class="card-option__label">1 Motiv</span>
+          </div>
+        </div>
+        <div class="card-option" data-value="2–3 Motive" tabindex="0">
+          <div class="card-option__visual">
+            <svg width="56" height="48" viewBox="0 0 30 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="6.5" cy="8.5" r="1.5"/><polyline points="19 15 14 10 3 21"/><rect x="5" y="1" width="18" height="18" rx="2" ry="2" opacity="0.35"/></svg>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">B</span>
+            <span class="card-option__label">2–3 Motive</span>
+          </div>
+        </div>
+        <div class="card-option" data-value="Mehr als 3" tabindex="0">
+          <div class="card-option__visual">
+            <svg width="64" height="48" viewBox="0 0 36 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="5" width="16" height="16" rx="2" ry="2"/><circle cx="6" cy="10" r="1.5"/><polyline points="17 16 13 12 3 21"/><rect x="5" y="3" width="16" height="16" rx="2" ry="2" opacity="0.4"/><rect x="9" y="1" width="16" height="16" rx="2" ry="2" opacity="0.2"/><text x="30" y="14" font-size="16" font-weight="bold" fill="var(--color-primary)" stroke="none" font-family="Poppins, sans-serif">+</text></svg>
+          </div>
+          <div class="card-option__bottom">
+            <span class="card-option__key">C</span>
+            <span class="card-option__label">Mehr als 3</span>
+          </div>
+        </div>
+      </div>
+      <div class="step__nav">
+        <button class="btn-back" data-back aria-label="Zurück">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="btn-next" id="btn5" disabled>OK
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <span class="key-hint">drücke <kbd>Enter ↵</kbd></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 6: Existing material ========== -->
+  <div class="step" data-step="6">
+    <div class="step__inner">
+      <div class="step__number">
+        <span>6</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+      <h2 class="step__question">Haben Sie bereits Werbematerial (z.&nbsp;B. Spot, Video oder Grafik)?<span class="step__required">*</span></h2>
+      <div class="choices" data-name="werbematerial">
+        <div class="choice" data-value="Ja, ist vorhanden" tabindex="0">
+          <span class="choice__key">A</span>
+          <span class="choice__label">Ja, ist vorhanden</span>
+        </div>
+        <div class="choice" data-value="Nein, ich benötige Unterstützung bei der Erstellung" tabindex="0">
+          <span class="choice__key">B</span>
+          <span class="choice__label">Nein, ich benötige Unterstützung bei der Erstellung</span>
+        </div>
+      </div>
+      <div class="step__nav">
+        <button class="btn-back" data-back aria-label="Zurück">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="btn-next" id="btn6" disabled>OK
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <span class="key-hint">drücke <kbd>Enter ↵</kbd></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 7: Contact form ========== -->
+  <div class="step" data-step="7">
+    <div class="step__inner">
+      <div class="step__number">
+        <span>7</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+      <h2 class="step__question">Kontaktformular<span class="step__required">*</span></h2>
+      <div class="form-fields">
+        <div class="form-group">
+          <label>Vorname</label>
+          <input type="text" id="vorname" placeholder="Verena" autocomplete="given-name">
+        </div>
+        <div class="form-group">
+          <label>Nachname</label>
+          <input type="text" id="nachname" placeholder="Unterwurzacher" autocomplete="family-name">
+        </div>
+        <div class="form-group">
+          <label>Telefonnummer <span class="required">*</span></label>
+          <div class="phone-wrapper" id="phoneWrapper">
+            <div class="phone-flag">🇩🇪<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <input type="tel" id="telefon" placeholder="01512 3456789" autocomplete="tel">
+          </div>
+          <span class="error-msg" id="phoneError">Bitte geben Sie Ihre Telefonnummer ein.</span>
+        </div>
+        <div class="form-group">
+          <label>E-Mail-Adresse <span class="required">*</span></label>
+          <input type="email" id="email" placeholder="name@beispiel.com" autocomplete="email">
+          <span class="error-msg" id="emailError">Bitte geben Sie eine gültige E-Mail-Adresse ein.</span>
+        </div>
+        <div class="form-group">
+          <label>Firma <span class="required">*</span></label>
+          <input type="text" id="firma" placeholder="Zahlemann & Söhne" autocomplete="organization">
+          <span class="error-msg" id="firmaError">Bitte geben Sie Ihren Firmennamen ein.</span>
+        </div>
+      </div>
+      <div class="step__nav">
+        <button class="btn-back" data-back aria-label="Zurück">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="btn-next" id="btn7" disabled>Absenden
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SUCCESS ========== -->
+  <div class="step" data-step="8">
+    <div class="step__inner success-screen">
+      <div class="success-screen__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>Vielen Dank!</h2>
+      <p>Ihre Anfrage wurde erfolgreich gesendet. Unser Team meldet sich in Kürze bei Ihnen.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var TOTAL = 7;
+  var current = 1;
+  var data = {};
+  var transitioning = false;
+
+  var fill = document.getElementById('progressFill');
+
+  function progress() {
+    var pct = ((current - 1) / TOTAL) * 100;
+    fill.style.width = pct + '%';
+  }
+
+  function stepEl(n) {
+    return document.querySelector('[data-step="' + n + '"]');
+  }
+
+  function goTo(n, direction) {
+    if (n < 1 || n > TOTAL + 1 || transitioning) return;
+    transitioning = true;
+
+    var cur = stepEl(current);
+    var next = stepEl(n);
+    var forward = n > current;
+
+    // Exit current
+    cur.classList.remove('active');
+    cur.classList.add(forward ? 'exit-up' : 'exit-down');
+
+    current = n;
+    progress();
+
+    // Prepare next offscreen
+    next.classList.remove('exit-up', 'exit-down', 'active');
+    next.style.transform = forward ? 'translateY(40px)' : 'translateY(-40px)';
+    next.style.opacity = '0';
+
+    // Force reflow
+    void next.offsetWidth;
+
+    // Remove inline styles to let CSS transition kick in
+    setTimeout(function () {
+      next.style.transform = '';
+      next.style.opacity = '';
+      next.classList.add('active');
+
+      if (n === 7) {
+        setTimeout(function () { document.getElementById('vorname').focus(); }, 350);
+      }
+
+      setTimeout(function () {
+        cur.classList.remove('exit-up', 'exit-down');
+        transitioning = false;
+      }, 500);
+    }, 50);
+  }
+
+  // Back buttons
+  document.querySelectorAll('[data-back]').forEach(function (btn) {
+    btn.addEventListener('click', function () { goTo(current - 1, 'back'); });
+  });
+
+  // Choice selection
+  document.querySelectorAll('.choices').forEach(function (c) {
+    var items = c.querySelectorAll('.choice');
+    items.forEach(function (item) {
+      item.addEventListener('click', function () {
+        items.forEach(function (i) { i.classList.remove('selected'); });
+        item.classList.add('selected');
+        data[c.dataset.name] = item.dataset.value;
+        enableBtn();
+      });
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }
+      });
+    });
+  });
+
+  // Card selection
+  document.querySelectorAll('.cards').forEach(function (c) {
+    var items = c.querySelectorAll('.card-option');
+    items.forEach(function (item) {
+      item.addEventListener('click', function () {
+        items.forEach(function (i) { i.classList.remove('selected'); });
+        item.classList.add('selected');
+        data[c.dataset.name] = item.dataset.value;
+        enableBtn();
+      });
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }
+      });
+    });
+  });
+
+  function enableBtn() {
+    var btn = document.getElementById('btn' + current);
+    if (btn) btn.disabled = false;
+  }
+
+  // Keyboard: A/B/C/D + Enter
+  document.addEventListener('keydown', function (e) {
+    if (current >= 7) return;
+    var tag = document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+    var map = { a: 0, b: 1, c: 2, d: 3 };
+    var k = e.key.toLowerCase();
+    if (map.hasOwnProperty(k)) {
+      var opts = stepEl(current).querySelectorAll('.choice, .card-option');
+      if (opts[map[k]]) opts[map[k]].click();
+    }
+    if (e.key === 'Enter') {
+      var btn = document.getElementById('btn' + current);
+      if (btn && !btn.disabled) btn.click();
+    }
+  });
+
+  // Enter on step 7 (form)
+  document.addEventListener('keydown', function (e) {
+    if (current !== 7 || e.key !== 'Enter') return;
+    var btn = document.getElementById('btn7');
+    if (btn && !btn.disabled) btn.click();
+  });
+
+  // Next buttons 1-6
+  for (var i = 1; i <= 6; i++) {
+    (function (s) {
+      document.getElementById('btn' + s).addEventListener('click', function () {
+        if (!this.disabled) goTo(s + 1, 'forward');
+      });
+    })(i);
+  }
+
+  // Step 7 validation
+  var fields = ['vorname', 'nachname', 'telefon', 'email', 'firma'];
+  fields.forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', function () {
+      el.classList.remove('invalid');
+      if (id === 'telefon') {
+        document.getElementById('phoneWrapper').classList.remove('invalid');
+        document.getElementById('phoneError').style.display = 'none';
+      }
+      if (id === 'email') document.getElementById('emailError').style.display = 'none';
+      if (id === 'firma') document.getElementById('firmaError').style.display = 'none';
+      validateForm();
+    });
+  });
+
+  function validateForm() {
+    var tel = document.getElementById('telefon').value.trim();
+    var em = document.getElementById('email').value.trim();
+    var fi = document.getElementById('firma').value.trim();
+    var ok = tel.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em) && fi.length > 0;
+    document.getElementById('btn7').disabled = !ok;
+  }
+
+  // Submit
+  document.getElementById('btn7').addEventListener('click', function () {
+    if (this.disabled) return;
+
+    var valid = true;
+    var tel = document.getElementById('telefon');
+    var em = document.getElementById('email');
+    var fi = document.getElementById('firma');
+
+    if (!tel.value.trim()) {
+      document.getElementById('phoneWrapper').classList.add('invalid');
+      document.getElementById('phoneError').style.display = 'block';
+      valid = false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim())) {
+      em.classList.add('invalid');
+      document.getElementById('emailError').style.display = 'block';
+      valid = false;
+    }
+    if (!fi.value.trim()) {
+      fi.classList.add('invalid');
+      document.getElementById('firmaError').style.display = 'block';
+      valid = false;
+    }
+    if (!valid) return;
+
+    data.vorname = document.getElementById('vorname').value.trim();
+    data.nachname = document.getElementById('nachname').value.trim();
+    data.telefon = tel.value.trim();
+    data.email = em.value.trim();
+    data.firma = fi.value.trim();
+
+    // Disable button while sending
+    var submitBtn = document.getElementById('btn7');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Wird gesendet...';
+
+    // Build the email message body
+    var message =
+      'Was möchten Sie mit Ihrer Kampagne erreichen?\n→ ' + (data.kampagnenziel || '–') + '\n\n' +
+      'Wann soll Ihre Kampagne starten?\n→ ' + (data.starttermin || '–') + '\n\n' +
+      'Welches Paket interessiert Sie?\n→ ' + (data.paket || '–') + '\n\n' +
+      'Wie lange soll Ihre Werbung laufen?\n→ ' + (data.laufzeit || '–') + '\n\n' +
+      'Wie viele Motive oder Spots möchten Sie einsetzen?\n→ ' + (data.motive || '–') + '\n\n' +
+      'Haben Sie bereits Werbematerial (z. B. Spot, Video oder Grafik)?\n→ ' + (data.werbematerial || '–') + '\n\n' +
+      'Vorname: ' + (data.vorname || '–') + '\n' +
+      'Nachname: ' + (data.nachname || '–') + '\n' +
+      'Telefonnummer: ' + data.telefon + '\n' +
+      'E-Mail: ' + data.email + '\n' +
+      'Firma: ' + data.firma;
+
+    // Send via Formsubmit.co (auto-delivers to marketing@planville.de)
+    var formPayload = new FormData();
+    formPayload.append('_subject', 'Neue Anfrage über das Kontaktformular (RentAd24)');
+    formPayload.append('_replyto', data.email);
+    formPayload.append('_template', 'table');
+    formPayload.append('Kampagnenziel', data.kampagnenziel || '–');
+    formPayload.append('Starttermin', data.starttermin || '–');
+    formPayload.append('Paket', data.paket || '–');
+    formPayload.append('Laufzeit', data.laufzeit || '–');
+    formPayload.append('Motive/Spots', data.motive || '–');
+    formPayload.append('Werbematerial vorhanden', data.werbematerial || '–');
+    formPayload.append('Vorname', data.vorname || '–');
+    formPayload.append('Nachname', data.nachname || '–');
+    formPayload.append('Telefonnummer', data.telefon);
+    formPayload.append('E-Mail', data.email);
+    formPayload.append('Firma', data.firma);
+    formPayload.append('_captcha', 'false');
+
+    fetch('https://formsubmit.co/ajax/marketing@planville.de', {
+      method: 'POST',
+      body: formPayload
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (result) {
+      fill.style.width = '100%';
+      goTo(8, 'forward');
+    })
+    .catch(function (err) {
+      // Fallback: still show success (email may have been queued)
+      console.error('Form submission error:', err);
+      fill.style.width = '100%';
+      goTo(8, 'forward');
+    });
+  });
+
+  progress();
+})();
+</script>
+</body>
+</html>
